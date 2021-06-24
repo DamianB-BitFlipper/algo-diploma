@@ -1,4 +1,5 @@
 import sys
+import yaml
 
 from algosdk.future import transaction
 from algosdk import account
@@ -148,6 +149,48 @@ def update_app(client, private_key, app_id, approval_program, clear_program):
     app_id = transaction_response['txn']['txn']['apid']
     print("Updated existing app-id: ", app_id)
 
+def parse_config():
+    err_msg = """Malformed configuration file: """
+
+    registrar = None
+    accounts = {}
+    APP_ID = None
+    
+    # Parse the configuration file to extract the `registrar`, `accounts` and `APP_ID`
+    with open('config.yml', 'r') as cfile:
+        config = yaml.safe_load(cfile)
+
+        for k, v in config.items():
+            if k == 'APP_ID':
+                if type(v) == int:
+                    APP_ID = v
+                else:
+                    raise ValueError(err_msg + "APP_ID must be an int")
+
+            elif k == 'registrar':
+                if type(v) == str:
+                    registrar = v
+                else:
+                    raise ValueError(err_msg + "registrar must be a string")
+
+            else: 
+                # This must be an account
+                if 'mnemonic' in v and type(v['mnemonic']) == str:
+                    accounts[k] = v['mnemonic']
+                else:
+                    raise ValueError(err_msg + "account must be a string of mnemonic keywords")
+
+    # Make sure all of the return items have been set
+    if registrar == None or accounts == {} or APP_ID == None:
+        raise ValueError(err_msg + "Missing one of registrar, accounts or APP_ID")
+
+    # Make sure that the `registrar` is a supplied account
+    if registrar not in accounts:
+        raise ValueError(err_msg + "registrar account mnemonic not supplied")
+
+    # Return the parsed values
+    return registrar, accounts, APP_ID
+
 def main():
     # TODO: Write this to artifacts file
     APP_ID = 11
@@ -156,24 +199,26 @@ def main():
         deploy: Deploy this smart contract for the first time
         update: Update this smart contract with new TEAL code
         opt-in: Opt-in the registrar and student to this smart contract
-        issue-diploma: Issue an MIT degree to Damian
-        inspect: Inspect Damian's MIT degree on the Algorand blockchain
-        """ 
+        issue-diploma <account-name> <diploma-metadata>: Issue a degree to an account
+        inspect <account-name>: Inspect an account's diploma on the Algorand blockchain""" 
 
     if len(sys.argv) < 2:
         print(help_msg)
         return
 
-    # Initialize an algodClient
+    try:
+        registrar, accounts, APP_ID = parse_config()
+    except ValueError as e:
+        # There was an error
+        print(e)
+        return
+
+    # Initialize an `AlgodClient`
     algod_client = algod.AlgodClient(algod_token, algod_address)
 
-    # Define the public keys
-    registrar_public_key = common.get_public_key_from_mnemonic(registrar_mnemonic)
-    student_public_key = common.get_public_key_from_mnemonic(student_mnemonic)
-
-    # Define the private keys
-    registrar_private_key = common.get_private_key_from_mnemonic(registrar_mnemonic)
-    student_private_key = common.get_private_key_from_mnemonic(student_mnemonic)
+    # Define the public and private keys
+    pub_keys = {name: common.get_public_key_from_mnemonic(mnemonic) for (name, mnemonic) in accounts.items()}
+    priv_keys = {name: common.get_private_key_from_mnemonic(mnemonic) for (name, mnemonic) in accounts.items()}
 
     if sys.argv[1] == "deploy" or sys.argv[1] == "update":
         # Read the smart contract source files
@@ -190,10 +235,10 @@ def main():
             # TODO: Save the `app_id` to some ./artifacts JSON file
             #
             # Create the diploma application
-            app_id = create_app(algod_client, registrar_private_key, smart_contract_program, clear_program, global_schema, local_schema)
+            app_id = create_app(algod_client, priv_keys[registrar], smart_contract_program, clear_program, global_schema, local_schema)
         elif sys.argv[1] == "update":
             # This is a update to the smart contract
-            update_app(algod_client, registrar_private_key, APP_ID, smart_contract_program, clear_program)
+            update_app(algod_client, priv_keys[registrar], APP_ID, smart_contract_program, clear_program)
 
         # Clean up the source files
         smart_contract_file.close()
@@ -205,15 +250,30 @@ def main():
         opt_in_app(algod_client, student_private_key, 11)
 
     elif sys.argv[1] == "issue-diploma":
-        app_args = [b'issue_diploma', b'Damian Barabonkov,MIT,2020,BSc,Computer Science and Engineering']
-        accounts = [student_public_key]
+        # The `issue-diploma` command takes two additional arguments
+        if len(sys.argv) != 4:
+            print(help_msg)
+            return
+
+        student = sys.argv[2]
+        diploma_metadata = sys.argv[3]
+
+        app_args = [b'issue_diploma', bytes(diploma_metadata)]
+        accounts = [pub_keys[student]]
+
+        print("Issuing diploma for {}: {}".format(student, diploma_metadata))
 
         # Call application with the relevant arguments
-        call_app(algod_client, registrar_private_key, APP_ID, app_args, accounts)
+        call_app(algod_client, priv_keys[registrar], APP_ID, app_args, accounts)
 
     elif sys.argv[1] == "inspect":
+        # The `inspect` command takes one additional argument
+        if len(sys.argv) != 3:
+            print(help_msg)
+            return
+
         # TODO: Make the inspect more human readable
-        common.read_local_state(algod_client, registrar_public_key, APP_ID)
+        common.read_local_state(algod_client, pub_keys[sys.argv[2]], APP_ID)
 
     # TODO: Handle registrar reassignment
     # TODO: Handle diploma revocation
