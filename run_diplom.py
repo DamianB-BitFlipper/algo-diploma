@@ -7,8 +7,7 @@ from algosdk.v2client import algod
 
 import common
 
-registrar_mnemonic = "candy eager deal flush pull elite job second art divorce task market cattle term write reform month sphere scissors fluid pumpkin feed issue abstract aunt"
-student_mnemonic = "learn cable switch safe increase maze garage museum royal nature dance pair uncle neither become practice bench ball giant curious fabric indicate token able release"
+CONFIG_FILE = "config.yml"
 
 algod_address = "http://localhost:4001"
 algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -25,6 +24,8 @@ local_schema = transaction.StateSchema(local_ints, local_bytes)
 def create_app(client, private_key, 
                approval_program, clear_program, 
                global_schema, local_schema): 
+    print("Creating new app")
+
     # Define sender as creator
     sender = account.address_from_private_key(private_key)
 
@@ -122,6 +123,8 @@ def call_app(client, private_key, index, app_args, accounts):
 
 # Update existing application
 def update_app(client, private_key, app_id, approval_program, clear_program): 
+    print("Updating existing app")
+
     # Declare sender
     sender = account.address_from_private_key(private_key)
 
@@ -149,6 +152,91 @@ def update_app(client, private_key, app_id, approval_program, clear_program):
     app_id = transaction_response['txn']['txn']['apid']
     print("Updated existing app-id: ", app_id)
 
+# Delete application
+def delete_app(client, private_key, index): 
+    print("Deleting app")
+
+    # Declare sender
+    sender = account.address_from_private_key(private_key)
+
+    # Get node suggested parameters
+    params = client.suggested_params()
+    params.flat_fee = True
+    params.fee = 1000
+
+    # Create unsigned transaction
+    txn = transaction.ApplicationDeleteTxn(sender, params, index)
+
+    # Sign transaction
+    signed_txn = txn.sign(private_key)
+    tx_id = signed_txn.transaction.get_txid()
+
+    # Send transaction
+    client.send_transactions([signed_txn])
+
+    # Await confirmation
+    common.wait_for_confirmation(client, tx_id)
+
+    # Display results
+    transaction_response = client.pending_transaction_info(tx_id)
+    print("Deleted app-id: ",transaction_response['txn']['txn']['apid'])    
+
+# Close out from application
+def close_out_app(client, private_key, index): 
+    # Declare sender
+    sender = account.address_from_private_key(private_key)
+    print("Closing out app for account: ", sender)
+
+    # Get node suggested parameters
+    params = client.suggested_params()
+    params.flat_fee = True
+    params.fee = 1000
+
+    # Create unsigned transaction
+    txn = transaction.ApplicationCloseOutTxn(sender, params, index)
+
+    # Sign transaction
+    signed_txn = txn.sign(private_key)
+    tx_id = signed_txn.transaction.get_txid()
+
+    # Send transaction
+    client.send_transactions([signed_txn])
+
+    # Await confirmation
+    common.wait_for_confirmation(client, tx_id)
+
+    # Display results
+    transaction_response = client.pending_transaction_info(tx_id)
+    print("Closed out from app-id: ",transaction_response['txn']['txn']['apid'])
+
+# Clear application
+def clear_app(client, private_key, index): 
+    # Declare sender
+    sender = account.address_from_private_key(private_key)
+    print("Clearing app for account: ", sender)
+
+    # Get node suggested parameters
+    params = client.suggested_params()
+    params.flat_fee = True
+    params.fee = 1000
+
+    # Create unsigned transaction
+    txn = transaction.ApplicationClearStateTxn(sender, params, index)
+
+    # Sign transaction
+    signed_txn = txn.sign(private_key)
+    tx_id = signed_txn.transaction.get_txid()
+
+    # Send transaction
+    client.send_transactions([signed_txn])
+
+    # Await confirmation
+    common.wait_for_confirmation(client, tx_id)
+
+    # Display results
+    transaction_response = client.pending_transaction_info(tx_id)
+    print("Cleared app-id: ",transaction_response['txn']['txn']['apid'])    
+
 def parse_config():
     err_msg = """Malformed configuration file: """
 
@@ -157,7 +245,7 @@ def parse_config():
     APP_ID = None
     
     # Parse the configuration file to extract the `registrar`, `accounts` and `APP_ID`
-    with open('config.yml', 'r') as cfile:
+    with open(CONFIG_FILE, 'r') as cfile:
         config = yaml.safe_load(cfile)
 
         for k, v in config.items():
@@ -192,18 +280,22 @@ def parse_config():
     return registrar, accounts, APP_ID
 
 def main():
-    # TODO: Write this to artifacts file
-    APP_ID = 11
-
     help_msg = """Available commands:
         deploy: Deploy this smart contract for the first time
         update: Update this smart contract with new TEAL code
-        opt-in: Opt-in the registrar and student to this smart contract
+        opt-in <account-name>: Opt-in an account into this smart contract
+        close-out <account-name>: Close-out an account from this smart contract
+        delete <creator-name>: Delete this smart contract
+        clear <account-name>: Clear this smart contract
         issue-diploma <account-name> <diploma-metadata>: Issue a degree to an account
+        revoke-diploma <account-name>: Nullify the diploma of an account
         inspect <account-name>: Inspect an account's diploma on the Algorand blockchain
-        reassign-registrar <account-name>: Assign an account to be the current registrar""" 
+        inspect-global <creator-name>: Inspect this smart contract's global state
+        reassign-registrar <account-name>: Assign an account to be the current registrar
+        help: Print this help message""" 
 
     if len(sys.argv) < 2:
+        print("Must supply at least command argument")
         print(help_msg)
         return
 
@@ -233,10 +325,10 @@ def main():
 
         # If this is a first time deploy
         if sys.argv[1] == "deploy":
-            # TODO: Save the `app_id` to some ./artifacts JSON file
-            #
             # Create the diploma application
             app_id = create_app(algod_client, priv_keys[registrar], smart_contract_program, clear_program, global_schema, local_schema)
+
+            print("Record the APP_ID {} in {}".format(app_id, CONFIG_FILE))
         elif sys.argv[1] == "update":
             # This is a update to the smart contract
             update_app(algod_client, priv_keys[registrar], APP_ID, smart_contract_program, clear_program)
@@ -246,9 +338,44 @@ def main():
         clear_program_file.close()
 
     elif sys.argv[1] == "opt-in":
-        # Opt-in both the registrar and the student
-        opt_in_app(algod_client, registrar_private_key, 11)
-        opt_in_app(algod_client, student_private_key, 11)
+        # The `opt-in` command takes one additional argument
+        if len(sys.argv) != 3:
+            print(help_msg)
+            return
+
+        account = sys.argv[2]
+
+        # Opt-in to the `account`
+        opt_in_app(algod_client, priv_keys[account], APP_ID)
+
+    elif sys.argv[1] == "close-out":
+        # The `close-out` command takes one additional arguments
+        if len(sys.argv) != 3:
+            print(help_msg)
+            return
+
+        account = sys.argv[2]
+
+        # Close out the `account`
+        close_out_app(algod_client, priv_keys[account], APP_ID)
+
+    elif sys.argv[1] == "delete":
+        # The `delete` command takes one additional arguments
+        if len(sys.argv) != 3:
+            print(help_msg)
+            return
+
+        creator = sys.argv[2]
+        delete_app(algod_client, priv_keys[creator], APP_ID)
+
+    elif sys.argv[1] == "clear":
+        # The `clear` command takes one additional arguments
+        if len(sys.argv) != 3:
+            print(help_msg)
+            return
+
+        account = sys.argv[2]
+        clear_app(algod_client, priv_keys[account], APP_ID)
 
     elif sys.argv[1] == "issue-diploma":
         # The `issue-diploma` command takes two additional arguments
@@ -267,13 +394,41 @@ def main():
         # Call application with the relevant arguments
         call_app(algod_client, priv_keys[registrar], APP_ID, app_args, accounts)
 
+    elif sys.argv[1] == "revoke-diploma":
+        # The `revoke-diploma` command takes one additional argument
+        if len(sys.argv) != 3:
+            print(help_msg)
+            return
+
+        student = sys.argv[2]
+
+        app_args = [b'revoke_diploma']
+        accounts = [pub_keys[student]]
+
+        print("Revoking diploma for {}".format(student))
+
+        # Call application with the relevant arguments
+        call_app(algod_client, priv_keys[registrar], APP_ID, app_args, accounts)
+
     elif sys.argv[1] == "inspect":
         # The `inspect` command takes one additional argument
         if len(sys.argv) != 3:
             print(help_msg)
             return
 
-        common.read_local_state(algod_client, pub_keys[sys.argv[2]], APP_ID)
+        # Inspect an account supplied by name
+        account = sys.argv[2]
+        common.read_local_state(algod_client, pub_keys[account], APP_ID)
+
+    elif sys.argv[1] == "inspect-global":
+        # The `inspect-global` command takes one additional argument
+        if len(sys.argv) != 3:
+            print(help_msg)
+            return
+
+        # Inspect this app by its `creator`
+        creator = sys.argv[2]
+        common.read_global_state(algod_client, pub_keys[creator], APP_ID)
 
     elif sys.argv[1] == "reassign-registrar":
         # The `reassign-registrar` command takes one additional argument
@@ -291,9 +446,14 @@ def main():
         # Call application with the relevant arguments
         call_app(algod_client, priv_keys[registrar], APP_ID, app_args, accounts)
 
-    # TODO: Handle diploma revocation
+    elif sys.argv[1] == "help":
+        print(help_msg)
+
+    else:
+        print("Invalid command and arguments: {}".format(sys.argv[1:]))
+        print(help_msg)
+
     # TODO: Handle multiple diplomas
-    # TODO: Handle smart contract deletion
 
 if __name__ == '__main__':
     main()

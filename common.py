@@ -36,6 +36,12 @@ def read_local_state(client, addr, app_id):
     for index in local_state:
         if local_state[index] == app_id:
             print(f"local_state of account {addr} for app_id {app_id}:")
+
+            # Check if there is a local state to even display
+            if 'key-value' not in local_state:
+                print("\t", "No local state")
+                return
+
             for kv in local_state['key-value']:
                 key = base64.b64decode(kv['key'])
                 value = kv['value']
@@ -44,12 +50,23 @@ def read_local_state(client, addr, app_id):
 
                 print("\t", key, value)
 
-# TODO: Have the same formatting as the `read_local_state` function
-#
 # Read app global state
 def read_global_state(client, addr, app_id):   
     results = client.account_info(addr)
     apps_created = results['created-apps']
     for app in apps_created:
         if app['id'] == app_id:
-            print(f"global_state for app_id {app_id}: ", app['params']['global-state'])
+            print(f"global_state for app_id {app_id}:")
+
+            # Check if there is a global state to even display
+            if 'global-state' not in app['params']:
+                print("\t", "No global state")
+                return
+
+            for kv in app['params']['global-state']:
+                key = base64.b64decode(kv['key'])
+                value = kv['value']
+                if 'bytes' in value:
+                    value['bytes'] = base64.b64decode(value['bytes'])
+
+                print("\t", key, value)

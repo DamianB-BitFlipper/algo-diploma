@@ -21,6 +21,13 @@ def diplom_program():
         Return(Int(1))
     ])
 
+    revoke_diploma = Seq([
+        Assert(is_registrar),
+        Assert(Txn.application_args.length() == Int(1)),
+        App.localDel(Int(1), Bytes("diploma")),
+        Return(Int(1))
+    ])
+
     new_registrar = Txn.accounts[1]
     reassign_registrar = Seq([
         Assert(is_registrar),
@@ -36,6 +43,7 @@ def diplom_program():
         [Txn.on_completion() == OnComplete.CloseOut, Return(Int(1))],
         [Txn.on_completion() == OnComplete.OptIn, Return(Int(1))],
         [Txn.application_args[0] == Bytes("issue_diploma"), issue_diploma],
+        [Txn.application_args[0] == Bytes("revoke_diploma"), revoke_diploma],
         [Txn.application_args[0] == Bytes("reassign_registrar"), reassign_registrar]
     )
 
