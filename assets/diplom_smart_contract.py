@@ -40,8 +40,8 @@ def diplom_program():
         [Txn.application_id() == Int(0), init_contract],
         [Txn.on_completion() == OnComplete.DeleteApplication, Return(is_registrar)],
         [Txn.on_completion() == OnComplete.UpdateApplication, Return(is_registrar)],
-        [Txn.on_completion() == OnComplete.CloseOut, Return(Int(1))],
         [Txn.on_completion() == OnComplete.OptIn, Return(Int(1))],
+        [Txn.on_completion() == OnComplete.CloseOut, Return(Int(1))],
         [Txn.application_args[0] == Bytes("issue_diploma"), issue_diploma],
         [Txn.application_args[0] == Bytes("revoke_diploma"), revoke_diploma],
         [Txn.application_args[0] == Bytes("reassign_registrar"), reassign_registrar]
