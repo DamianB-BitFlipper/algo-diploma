@@ -24,7 +24,7 @@ def diplom_program():
     new_registrar = Txn.accounts[1]
     reassign_registrar = Seq([
         Assert(is_registrar),
-        Assert(Txn.application_args.length() == Int(2)),
+        Assert(Txn.application_args.length() == Int(1)),
         App.globalPut(var_registrar, new_registrar),
         Return(Int(1))
     ])

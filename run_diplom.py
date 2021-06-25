@@ -200,7 +200,8 @@ def main():
         update: Update this smart contract with new TEAL code
         opt-in: Opt-in the registrar and student to this smart contract
         issue-diploma <account-name> <diploma-metadata>: Issue a degree to an account
-        inspect <account-name>: Inspect an account's diploma on the Algorand blockchain""" 
+        inspect <account-name>: Inspect an account's diploma on the Algorand blockchain
+        reassign-registrar <account-name>: Assign an account to be the current registrar""" 
 
     if len(sys.argv) < 2:
         print(help_msg)
@@ -258,7 +259,7 @@ def main():
         student = sys.argv[2]
         diploma_metadata = sys.argv[3]
 
-        app_args = [b'issue_diploma', bytes(diploma_metadata)]
+        app_args = [b'issue_diploma', bytes(diploma_metadata, 'utf-8')]
         accounts = [pub_keys[student]]
 
         print("Issuing diploma for {}: {}".format(student, diploma_metadata))
@@ -272,10 +273,24 @@ def main():
             print(help_msg)
             return
 
-        # TODO: Make the inspect more human readable
         common.read_local_state(algod_client, pub_keys[sys.argv[2]], APP_ID)
 
-    # TODO: Handle registrar reassignment
+    elif sys.argv[1] == "reassign-registrar":
+        # The `reassign-registrar` command takes one additional argument
+        if len(sys.argv) != 3:
+            print(help_msg)
+            return
+
+        new_registrar = sys.argv[2]
+
+        app_args = [b'reassign_registrar']
+        accounts = [pub_keys[new_registrar]]
+
+        print("Reassigning the registrar to be {}".format(new_registrar))
+
+        # Call application with the relevant arguments
+        call_app(algod_client, priv_keys[registrar], APP_ID, app_args, accounts)
+
     # TODO: Handle diploma revocation
     # TODO: Handle multiple diplomas
     # TODO: Handle smart contract deletion
