@@ -285,7 +285,7 @@ def main():
         update: Update this smart contract with new TEAL code
         opt-in <account-name>: Opt-in an account into this smart contract
         close-out <account-name>: Close-out an account from this smart contract
-        delete <creator-name>: Delete this smart contract
+        delete: Delete this smart contract
         clear <account-name>: Clear this smart contract
         issue-diploma <account-name> <diploma-metadata>: Issue a degree to an account
         revoke-diploma <account-name>: Nullify the diploma of an account
@@ -314,6 +314,11 @@ def main():
     priv_keys = {name: common.get_private_key_from_mnemonic(mnemonic) for (name, mnemonic) in accounts.items()}
 
     if sys.argv[1] == "deploy" or sys.argv[1] == "update":
+        # The `deploy` and `update` commands take no additional arguments
+        if len(sys.argv) != 2:
+            print(help_msg)
+            return
+
         # Read the smart contract source files
         smart_contract_file = open("./assets/diplom_smart_contract.teal", "rb")
         smart_contract_source = smart_contract_file.read()
@@ -360,13 +365,12 @@ def main():
         close_out_app(algod_client, priv_keys[account], APP_ID)
 
     elif sys.argv[1] == "delete":
-        # The `delete` command takes one additional arguments
-        if len(sys.argv) != 3:
+        # The `delete` command takes no additional arguments
+        if len(sys.argv) != 2:
             print(help_msg)
             return
 
-        creator = sys.argv[2]
-        delete_app(algod_client, priv_keys[creator], APP_ID)
+        delete_app(algod_client, priv_keys[registrar], APP_ID)
 
     elif sys.argv[1] == "clear":
         # The `clear` command takes one additional arguments

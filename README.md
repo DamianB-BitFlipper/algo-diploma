@@ -177,19 +177,96 @@ Any arguments taken by each function is listed with angle brackets `<...>`.
 
 The `deploy`, `update`, `delete` and `clear` functions are used by a DApp administrator to maintain the DApp.
 
-TODO: Explain this more with code snippets
+##### Deploy
+
+Deployment of a smart contract begins with compiling the TEAL programs to a base64 encoded binary (the PyTEAL contract code is converted to TEAL by running `make`). 
+
+```
+# Read the smart contract source files
+smart_contract_file = open("./assets/diplom_smart_contract.teal", "rb")
+smart_contract_source = smart_contract_file.read()
+smart_contract_program = common.compile_program(algod_client, smart_contract_source)
+
+clear_program_file = open("./assets/clear_program.teal", "rb")
+clear_program_source = clear_program_file.read()
+clear_program = common.compile_program(algod_client, clear_program_source)
+```
+
+Then a transaction is sent into the network signallying the deployment of a new smart contract. The creator of this DApp is the account that sends this transaction. In this case, the registrar at the time of deployment is the DApp creator. The formulation of this transaction is handled by the Python SDK.
+
+```
+txn = transaction.ApplicationCreateTxn(
+        sender, params, on_complete, \
+        smart_contract_program, clear_program, \
+        global_schema, local_schema)
+```
+
+The `global_schema` and `local_schema` outline how many global and local storage variables this contract will use. For this DApp, both only indicate one `Bytes` storage variable each.
+
+##### Update
+
+Updating the source code of this DApp begins with compiling the TEAL programs, similarly to deployment. However, the update event involves a different type of transaction. Most notably, the `app_id` of the DApp must be submitted to point to which DApp to update. Only the current registrar may update this DApp. The Python SDK creates the transaction to update a smart contract as follows:
+
+```
+txn = transaction.ApplicationUpdateTxn(sender, params, app_id, \
+                                        smart_contract_program, clear_program)
+```
+
+##### Delete
+
+DApp deletion is performed by sending a specific transaction with the `app_id` of the DApp to be deleted. Only the current registrar may delete this DApp. This is handled concisely with the Python SDK.
+
+```
+txn = transaction.ApplicationDeleteTxn(sender, params, app_id)
+```
+
+##### Clear
+
+Any account can remove their participation from the DApp. This is done through sending a clearing transaction to the network. This implicity runs the `clear_program` of the DApp to perform any residual clean up and regardless if the clear program suceeds or not, the user will be removed from the DApp. The Python SDK creates the clear transaction as follows:
+
+```
+txn = transaction.ApplicationClearStateTxn(sender, params, app_id)
+```
 
 #### DApp Common Usage
 
 The `opt-in`, `close-out`, `issue-diploma`, `revoke-diploma` and `reassign-registrar` functions are the most common to be called by any user of this DApp.
 
-TODO: Explain this more with code snippets
+##### Opt-In
+
+Since this DApp utilizes local storage, any account wishing to participate in this DApp to receive a diploma must opt-in to it. This is performed by sending a specific opt-in transaction with the `app_id` of the DApp to join. The Python SDK creats the opt-in transaction as follows:
+
+```
+txn = transaction.ApplicationOptInTxn(sender, params, app_id)
+```
+
+##### Close-Out
+
+Separate from the clear function, an account can leave a DApp by closing out of it. An account leaves a DApp only if a close-out transaction with the corresponding `app_id` succeeds, differing form the clear function which unconditionally removes an account. In the case of this DApp, close-out always suceeds. The Python SDK creates the close-out transaction as follows:
+
+```
+txn = transaction.ApplicationCloseOutTxn(sender, params, app_id)
+```
 
 #### DApp Inspection
 
 The `inspect` and `inspect-global` functions allow a third party to view the state variables of this DApp. These functions are most useful to determine the integrity and validity of some student's diploma for example.
 
-TODO: Explain this more with code snippets
+##### Inspect
+
+Any 3rd party with access to the Algorand blockchain can inspect an account's local storage to view their diploma. The `account` to inspect is passed in as an argument to the DApp Interface Program. The local `Bytes` storage variables are base 64 encoded, so inspection decodes the value to be human readable. A `read_local_state` helper function adopted from an example Algorand SDK app serves this function.
+
+```
+common.read_local_state(algod_client, pub_keys[account], app_id)
+```
+
+##### Inspect Global
+
+A 3rd party can also inspect the global `Bytes` storage variable to see the current registrar. Global variables are stored in the `creator` account, the account that deployed the DApp. The DApp Interface Program uses the registrar during deployment as the creator account. However, even after registrar reassignment, the original creator account must be passed in to inspect the global current registrar variable. A `read_global_state` helper function from an example Algorand SDK app serves this function.
+
+```
+common.read_global_state(algod_client, pub_keys[creator], app_id)
+```
 
 ## Conclusion
 
@@ -197,6 +274,7 @@ This DApp exemplifies a simple yet tanglible use-case for the Algorand blockchai
 
 - Writing a PyTEAL smart contract adhering to all of the best standard practices
   - Supports the full life cycle of a smart contract, from deployment to deletion
+  - Multiple account types with differing privilege levels
   - Permission checking to ensure application security and integrity
   - Supports multiple commands with different behaviours
 - Writing an interface program using an Algorand SDK
