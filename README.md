@@ -2,13 +2,13 @@
 
 ## Usage
 
-TODO: Include a requirements.txt
-
 1. Set up `algod` and `goal` to connect to the testnet or a private network and create a few user accounts. Follow the tutorial for assistance: https://developer.algorand.org/docs/run-a-node/setup/install/
 
-2. Once you have a few test accounts with a balance,  list them in the `config.yml` file:
+2. Install the required Python packages: `pip install requirements.txt`
 
-```
+3. Once you have a few test accounts with a balance,  list them in the `config.yml` file:
+
+```yaml
 registrar: "alice"
 
 alice:
@@ -25,12 +25,12 @@ APP_ID: -1
 
 This example config file lists three users, of which `alice` is the registrar. The role of a registrar is to issue diplomas to the students, in this case `bob` and `charlie`. 
 
-TODO: Makefile
+4. Make the PyTEAL contract code: `make`
 
-3. Deploy the smart contract: `python3 run_diplom.py deploy`
+5. Deploy the smart contract: `python3 run_diplom.py deploy`
 This command will print an identifying number for `APP_ID`. Be sure to record this in the `config.yml`.
 
-4. Use the DApp:
+6. Use the DApp:
   1. Issue a diploma to `bob`: `python3 run_diplom.py issue-diploma bob "MIT,2020,BSc,Computer Science and Engineering"`
   2. Transfer registrar duties to `charlie`: `python3 run_diplom.py charlie` 
 Be sure to update the registrar in the `config.yml` accordingly.
@@ -72,7 +72,7 @@ This DApp implements a number of commands. A command is a sequence of PyTEAL ope
 This DApp supports three commands, diploma issuance, diploma revocation and registrar reassignment. Diploma issuance is handled by writing the diploma metadata to the local storage of the account. Diploma revocation is handled by clearing the account local storage. Lastly, registrar reassignment is handled by overwriting the global storage `"registrar"` variable with the new registrar's accont address.
 
 #### Contract Logic
-```
+```python
 var_registrar = Bytes("registrar")
 is_registrar = Txn.sender() == App.globalGet(var_registrar)
 
@@ -100,7 +100,7 @@ This is the contract logic which directs how the DApp reacts to certain commands
 
 #### Contract Initialization
 
-```
+```python
 init_contract = Seq([
         App.globalPut(var_registrar, Txn.sender()),
         Return(Int(1))
@@ -111,7 +111,7 @@ This block records the creator of the DApp as the initial registrar. This block 
 
 #### Diploma Issuance
 
-```
+```python
 diploma_metadata = Txn.application_args[1]
 issue_diploma = Seq([
         Assert(is_registrar),
@@ -125,7 +125,7 @@ This block issues a diploma to an account. This code block is invoked by the `"i
 
 #### Revoke Diploma
 
-```
+```python
 revoke_diploma = Seq([
         Assert(is_registrar),
         Assert(Txn.application_args.length() == Int(1)),
@@ -138,7 +138,7 @@ This block revokes the diploma of an account. This code is invoked by the `"revo
 
 #### Registrar Reassignment
 
-```
+```python
 new_registrar = Txn.accounts[1]
 reassign_registrar = Seq([
         Assert(is_registrar),
@@ -181,7 +181,7 @@ The `deploy`, `update`, `delete` and `clear` functions are used by a DApp admini
 
 Deployment of a smart contract begins with compiling the TEAL programs to a base64 encoded binary (the PyTEAL contract code is converted to TEAL by running `make`). 
 
-```
+```python
 # Read the smart contract source files
 smart_contract_file = open("./assets/diplom_smart_contract.teal", "rb")
 smart_contract_source = smart_contract_file.read()
@@ -194,7 +194,7 @@ clear_program = common.compile_program(algod_client, clear_program_source)
 
 Then a transaction is sent into the network signallying the deployment of a new smart contract. The creator of this DApp is the account that sends this transaction. In this case, the registrar at the time of deployment is the DApp creator. The formulation of this transaction is handled by the Python SDK.
 
-```
+```python
 txn = transaction.ApplicationCreateTxn(
         sender, params, on_complete, \
         smart_contract_program, clear_program, \
@@ -207,7 +207,7 @@ The `global_schema` and `local_schema` outline how many global and local storage
 
 Updating the source code of this DApp begins with compiling the TEAL programs, similarly to deployment. However, the update event involves a different type of transaction. Most notably, the `app_id` of the DApp must be submitted to point to which DApp to update. Only the current registrar may update this DApp. The Python SDK creates the transaction to update a smart contract as follows:
 
-```
+```python
 txn = transaction.ApplicationUpdateTxn(sender, params, app_id, \
                                         smart_contract_program, clear_program)
 ```
@@ -216,7 +216,7 @@ txn = transaction.ApplicationUpdateTxn(sender, params, app_id, \
 
 DApp deletion is performed by sending a specific transaction with the `app_id` of the DApp to be deleted. Only the current registrar may delete this DApp. This is handled concisely with the Python SDK.
 
-```
+```python
 txn = transaction.ApplicationDeleteTxn(sender, params, app_id)
 ```
 
@@ -224,7 +224,7 @@ txn = transaction.ApplicationDeleteTxn(sender, params, app_id)
 
 Any account can remove their participation from the DApp. This is done through sending a clearing transaction to the network. This implicity runs the `clear_program` of the DApp to perform any residual clean up and regardless if the clear program suceeds or not, the user will be removed from the DApp. The Python SDK creates the clear transaction as follows:
 
-```
+```python
 txn = transaction.ApplicationClearStateTxn(sender, params, app_id)
 ```
 
@@ -236,7 +236,7 @@ The `opt-in`, `close-out`, `issue-diploma`, `revoke-diploma` and `reassign-regis
 
 Since this DApp utilizes local storage, any account wishing to participate in this DApp to receive a diploma must opt-in to it. This is performed by sending a specific opt-in transaction with the `app_id` of the DApp to join. The Python SDK creats the opt-in transaction as follows:
 
-```
+```python
 txn = transaction.ApplicationOptInTxn(sender, params, app_id)
 ```
 
@@ -244,7 +244,7 @@ txn = transaction.ApplicationOptInTxn(sender, params, app_id)
 
 Separate from the clear function, an account can leave a DApp by closing out of it. An account leaves a DApp only if a close-out transaction with the corresponding `app_id` succeeds, differing form the clear function which unconditionally removes an account. In the case of this DApp, close-out always suceeds. The Python SDK creates the close-out transaction as follows:
 
-```
+```python
 txn = transaction.ApplicationCloseOutTxn(sender, params, app_id)
 ```
 
@@ -256,7 +256,7 @@ The `inspect` and `inspect-global` functions allow a third party to view the sta
 
 Any 3rd party with access to the Algorand blockchain can inspect an account's local storage to view their diploma. The `account` to inspect is passed in as an argument to the DApp Interface Program. The local `Bytes` storage variables are base 64 encoded, so inspection decodes the value to be human readable. A `read_local_state` helper function adopted from an example Algorand SDK app serves this function.
 
-```
+```python
 common.read_local_state(algod_client, pub_keys[account], app_id)
 ```
 
@@ -264,7 +264,7 @@ common.read_local_state(algod_client, pub_keys[account], app_id)
 
 A 3rd party can also inspect the global `Bytes` storage variable to see the current registrar. Global variables are stored in the `creator` account, the account that deployed the DApp. The DApp Interface Program uses the registrar during deployment as the creator account. However, even after registrar reassignment, the original creator account must be passed in to inspect the global current registrar variable. A `read_global_state` helper function from an example Algorand SDK app serves this function.
 
-```
+```python
 common.read_global_state(algod_client, pub_keys[creator], app_id)
 ```
 
