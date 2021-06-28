@@ -265,6 +265,24 @@ Separate from the clear function, an account can leave a DApp by closing out of 
 txn = transaction.ApplicationCloseOutTxn(sender, params, app_id)
 ```
 
+##### Issue Diploma
+
+The registrar issues a diploma by performing a call to the smart contract of this DApp. A call to the DApp is simply a transaction with the appropriate arguments required by the call. In the case of diploma issuance, that is the receiving account of the diploma as well as the diploma metadata -- degree type, institution, year, etc. This is fascilitated by the Python SDK as a NoOp application call as follows:
+
+```python
+txn = transaction.ApplicationNoOpTxn(sender, params, index, app_args, accounts)
+```
+
+The first argument of the `app_args` is the string `"issue-diploma"` which designates this call to issue a diploma.
+
+##### Revoke Diploma
+
+Similar to the diploma issuance, the registrar calls the DApp by sending a transaction with the appropriate arguments. In this case, this is only the account that will get its diploma revoked. This is fasciliated by the same Python SDK call as above, but where the first argument of the `app_args` is the string `"revoke-diploma"`.
+
+##### Reassign Registrar
+
+Similar to the other calls, registrar reassignment is a call to the DApp by the current registrar. Passed along is the account of the registrar to-be. The Python SDK call is the same as above, but the first argument of the `app_args` is the string `"reassign-registrar"`.
+
 #### DApp Inspection
 
 The `inspect` and `inspect-global` functions allow a third party to view the state variables of this DApp. These functions are most useful to determine the integrity and validity of some student's diploma for example.
