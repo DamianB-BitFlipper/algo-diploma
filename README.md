@@ -59,7 +59,9 @@ Be sure to update the registrar in the `config.yml` accordingly.
 
 ## Overview
 
-![Algo Diplom Overview](images/algo-diplom-overview.png)
+<p align="center">
+  <img src="images/algo-diplom-overview.png" />
+</p>
 
 This DApp demonstrates how the Algorand blockchain can facilitate diploma issuance for graduating university students. Graduating students can opt-in to this DApp. And then a privelleged registrar account can issue specific dimplomas to specific students. Students get their diploma recorded under their account which any 3rd party can audit and verify its integrity. 
 
