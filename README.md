@@ -23,7 +23,7 @@ charlie:
 APP_ID: -1
 ```
 
-This example config file lists three users, of which `alice` is the registrar. The role of a registrar is to issue diplomas to the students, in this case `bob` and `charlie`. 
+This example config file lists three users, of which `alice` is the registrar. The role of a registrar is to issue diplomas to the students, in this case, `bob` and `charlie`. 
 
 4. Make the PyTEAL contract code: `make`
 
@@ -63,9 +63,9 @@ Be sure to update the registrar in the `config.yml` accordingly.
   <img src="images/algo-diplom-overview.png" />
 </p>
 
-This DApp demonstrates how the Algorand blockchain can facilitate diploma issuance for graduating university students. Graduating students can opt-in to this DApp. And then a privelleged registrar account can issue specific dimplomas to specific students. Students get their diploma recorded under their account which any 3rd party can audit and verify its integrity. 
+This DApp demonstrates how the Algorand blockchain can facilitate diploma issuance for graduating university students. Graduating students can opt-in to this DApp. And then a privileged registrar account can issue specific diplomas to specific students. Students get their diploma recorded under their account which any 3rd party can audit and verify its integrity. 
 
-Additionally, the registrar can perform other operations for posterity. One such operation is transering registrar duties to another account. After such transfer, the designated account will become the new registrar and the old registrar will lose all priveleges. The registrar may also revoke diplomas if needed and also delete the entire DApp.
+Additionally, the registrar can perform other operations for posterity. One such operation is transferring registrar duties to another account. After such transfer, the designated account will become the new registrar and the old registrar will lose all privileges. The registrar may also revoke diplomas if needed and also delete the entire DApp.
 
 A detailed overview of all possible operations for both students and registrar can be found by running: `python3 run_diplom.py help`
 
@@ -81,14 +81,14 @@ A detailed overview of all possible operations for both students and registrar c
 This DApp is expressed as a stateful Algorand smart contract. It is written in [PyTEAL](https://pyteal.readthedocs.io/en/stable/overview.html "PyTEAL") following the suggested development [guidelines](https://developer.algorand.org/docs/reference/teal/guidelines/ "guidelines"). The smart contract source code is accessible [here](https://github.com/JSmith-BitFlipper/algo-diplom/blob/master/assets/diplom_smart_contract.py "here").
 
 #### Storage
-There is one global bytes field and one local bytes field (per optted-in account). The global field holds the address of the current registrar. The account with this address has all of the registrar privelleges of this DApp. The local field per account is where an issued diploma is recorded. A diploma is represented as a bytes array of common metadata such as issuing institution, year, degree title and type, etc.
+There is one global bytes field and one local bytes field (per opted-in account). The global field holds the address of the current registrar. The account with this address has all of the registrar privileges of this DApp. The local field per account is where an issued diploma is recorded. A diploma is represented as a bytes array of common metadata such as issuing institution, year, degree title and type, etc.
 
 #### Overall DApp Architecture
-In this DApp, there is an account designated as a registrar and all other accounts are simply students. A global storage variable named `"registrar"` delinates which account is the registrar. A local storage variable in each account stores any issued diploma metadata. Accounts must opt-in to this DApp in order to receive a diploma if one is issued to them. 
+In this DApp, there is an account designated as a registrar and all other accounts are simply students. A global storage variable named `"registrar"` delineates which account is the registrar. A local storage variable in each account stores any issued diploma metadata. Accounts must opt-in to this DApp in order to receive a diploma if one is issued to them. 
 
-This DApp implements a number of commands. A command is a sequence of PyTEAL operations which are called based on some conditional control-flow logic depending on a string argument passed in. Each command has it respective sanity checks, such as checking whether the caller is the registrar when necessary or the number of arguments supplied.
+This DApp implements a number of commands. A command is a sequence of PyTEAL operations which are called based on some conditional control-flow logic depending on a string argument passed in. Each command has its respective sanity checks, such as checking whether the caller is the registrar when necessary or the number of arguments supplied.
 
-This DApp supports three commands, diploma issuance, diploma revocation and registrar reassignment. Diploma issuance is handled by writing the diploma metadata to the local storage of the account. Diploma revocation is handled by clearing the account local storage. Lastly, registrar reassignment is handled by overwriting the global storage `"registrar"` variable with the new registrar's accont address.
+This DApp supports three commands, diploma issuance, diploma revocation, and registrar reassignment. Diploma issuance is handled by writing the diploma metadata to the local storage of the account. Diploma revocation is handled by clearing the account's local storage. Lastly, registrar reassignment is handled by overwriting the global storage `"registrar"` variable with the new registrar's account address.
 
 #### Contract Logic
 ```python
@@ -107,7 +107,7 @@ program = Cond(
 )
 ```
 
-This is the contract logic which directs how the DApp reacts to certain commands. The following breakdown explains this logic line-by-line.
+This is the contract logic that directs how the DApp reacts to certain commands. The following breakdown explains this logic line-by-line.
 - `Txn.application_id() == Int(0)`: When a smart contract is initially deployed, the `Txn.application_id()` will be 0. This is the time to call `init_contract`to record the creator as the initial registrar of the DApp.
 - `Txn.on_completion() == OnComplete.DeleteApplication`: Only allow the current registrar to delete this DApp.
 - `Txn.on_completion() == OnComplete.UpdateApplication`: Only allow the current registrar to update this DApp.
@@ -171,9 +171,9 @@ This block reassigns the registrar of this DApp. This code is invoked by the `"r
 
 ### DApp Interface Program
 
-This DApp is interfaced by a Python program using the Algorand SDK. This program is used to deploy the DApp as well as invoke the various DApp commands. Much of the SDK code and helper functions are borrowed from an example Algorand SDK app [here](https://github.com/algorand/docs/blob/master/examples/smart_contracts/v2/python/stateful_smart_contracts.py "here"). 
+This DApp is interfaced with a Python program using the Algorand SDK. This program is used to deploy the DApp as well as invoke the various DApp commands. Much of the SDK code and helper functions are borrowed from an example Algorand SDK app [here](https://github.com/algorand/docs/blob/master/examples/smart_contracts/v2/python/stateful_smart_contracts.py "here"). 
 
-This SDK program has a host of functions. The help message from `python3 run_diplom.py help` lists the avaialble functions:
+This SDK program has a host of functions. The help message from `python3 run_diplom.py help` lists the available functions:
 ```
 Available commands:
         deploy: Deploy this smart contract for the first time
@@ -190,11 +190,11 @@ Available commands:
         help: Print this help message
 ```
 
-Any arguments taken by each function is listed with angle brackets `<...>`.
+Any arguments taken by each function are listed with angle brackets `<...>`.
 
 #### DApp Maintenance
 
-The `deploy`, `update`, `delete` and `clear` functions are used by a DApp administrator to maintain the DApp.
+The `deploy`, `update`, `delete`, and `clear` functions are used by a DApp administrator to maintain the DApp.
 
 ##### Deploy
 
@@ -211,7 +211,7 @@ clear_program_source = clear_program_file.read()
 clear_program = common.compile_program(algod_client, clear_program_source)
 ```
 
-Then a transaction is sent into the network signallying the deployment of a new smart contract. The creator of this DApp is the account that sends this transaction. In this case, the registrar at the time of deployment is the DApp creator. The formulation of this transaction is handled by the Python SDK.
+Then a transaction is sent into the network signaling the deployment of a new smart contract. The creator of this DApp is the account that sends this transaction. In this case, the registrar at the time of deployment is the DApp creator. The formulation of this transaction is handled by the Python SDK.
 
 ```python
 txn = transaction.ApplicationCreateTxn(
@@ -241,7 +241,7 @@ txn = transaction.ApplicationDeleteTxn(sender, params, app_id)
 
 ##### Clear
 
-Any account can remove their participation from the DApp. This is done through sending a clearing transaction to the network. This implicity runs the `clear_program` of the DApp to perform any residual clean up and regardless if the clear program suceeds or not, the user will be removed from the DApp. The Python SDK creates the clear transaction as follows:
+Any account can remove their participation from the DApp. This is done by sending a clearing transaction to the network. This implicitly runs the `clear_program` of the DApp to perform any residual clean up and regardless of whether the clear program succeeds or not, the user will be removed from the DApp. The Python SDK creates the clear transaction as follows:
 
 ```python
 txn = transaction.ApplicationClearStateTxn(sender, params, app_id)
@@ -249,11 +249,11 @@ txn = transaction.ApplicationClearStateTxn(sender, params, app_id)
 
 #### DApp Common Usage
 
-The `opt-in`, `close-out`, `issue-diploma`, `revoke-diploma` and `reassign-registrar` functions are the most common to be called by any user of this DApp.
+The `opt-in`, `close-out`, `issue-diploma`, `revoke-diploma`, and `reassign-registrar` functions are the most common to be called by any user of this DApp.
 
 ##### Opt-In
 
-Since this DApp utilizes local storage, any account wishing to participate in this DApp to receive a diploma must opt-in to it. This is performed by sending a specific opt-in transaction with the `app_id` of the DApp to join. The Python SDK creats the opt-in transaction as follows:
+Since this DApp utilizes local storage, any account wishing to participate in this DApp to receive a diploma must opt-in to it. This is performed by sending a specific opt-in transaction with the `app_id` of the DApp to join. The Python SDK creates the opt-in transaction as follows:
 
 ```python
 txn = transaction.ApplicationOptInTxn(sender, params, app_id)
@@ -261,7 +261,7 @@ txn = transaction.ApplicationOptInTxn(sender, params, app_id)
 
 ##### Close-Out
 
-Separate from the clear function, an account can leave a DApp by closing out of it. An account leaves a DApp only if a close-out transaction with the corresponding `app_id` succeeds, differing form the clear function which unconditionally removes an account. In the case of this DApp, close-out always suceeds. The Python SDK creates the close-out transaction as follows:
+Separate from the clear function, an account can leave a DApp by closing out of it. An account leaves a DApp only if a close-out transaction with the corresponding `app_id` succeeds, differing from the clear function which unconditionally removes an account. In the case of this DApp, close-out always succeeds. The Python SDK creates the close-out transaction as follows:
 
 ```python
 txn = transaction.ApplicationCloseOutTxn(sender, params, app_id)
@@ -269,7 +269,7 @@ txn = transaction.ApplicationCloseOutTxn(sender, params, app_id)
 
 ##### Issue Diploma
 
-The registrar issues a diploma by performing a call to the smart contract of this DApp. A call to the DApp is simply a transaction with the appropriate arguments required by the call. In the case of diploma issuance, that is the receiving account of the diploma as well as the diploma metadata -- degree type, institution, year, etc. This is fascilitated by the Python SDK as a NoOp application call as follows:
+The registrar issues a diploma by performing a call to the smart contract of this DApp. A call to the DApp is simply a transaction with the appropriate arguments required by the call. In the case of diploma issuance, that is the receiving account of the diploma as well as the diploma metadata -- degree type, institution, year, etc. This is facilitated by the Python SDK as a NoOp application call as follows:
 
 ```python
 txn = transaction.ApplicationNoOpTxn(sender, params, index, app_args, accounts)
@@ -279,7 +279,7 @@ The first argument of the `app_args` is the string `"issue-diploma"` which desig
 
 ##### Revoke Diploma
 
-Similar to the diploma issuance, the registrar calls the DApp by sending a transaction with the appropriate arguments. In this case, this is only the account that will get its diploma revoked. This is fasciliated by the same Python SDK call as above, but where the first argument of the `app_args` is the string `"revoke-diploma"`.
+Similar to the diploma issuance, the registrar calls the DApp by sending a transaction with the appropriate arguments. In this case, this is only the account that will get its diploma revoked. This is facilitated by the same Python SDK call as above, but where the first argument of the `app_args` is the string `"revoke-diploma"`.
 
 ##### Reassign Registrar
 
@@ -287,11 +287,11 @@ Similar to the other calls, registrar reassignment is a call to the DApp by the 
 
 #### DApp Inspection
 
-The `inspect` and `inspect-global` functions allow a third party to view the state variables of this DApp. These functions are most useful to determine the integrity and validity of some student's diploma for example.
+The `inspect` and `inspect-global` functions allow a third party to view the state variables of this DApp. These functions are most useful to determine the integrity and validity of a student's diploma for example.
 
 ##### Inspect
 
-Any 3rd party with access to the Algorand blockchain can inspect an account's local storage to view their diploma. The `account` to inspect is passed in as an argument to the DApp Interface Program. The local `Bytes` storage variables are base 64 encoded, so inspection decodes the value to be human readable. A `read_local_state` helper function adopted from an example Algorand SDK app serves this function.
+Any 3rd party with access to the Algorand blockchain can inspect an account's local storage to view their diploma. The `account` to inspect is passed in as an argument to the DApp Interface Program. The local `Bytes` storage variables are base 64 encoded, so inspection decodes the value to be human-readable. A `read_local_state` helper function adopted from an example Algorand SDK app serves this function.
 
 ```python
 common.read_local_state(algod_client, pub_keys[account], app_id)
@@ -307,13 +307,13 @@ common.read_global_state(algod_client, pub_keys[creator], app_id)
 
 ## Conclusion
 
-This DApp exemplifies a simple yet tanglible use-case for the Algorand blockchain. This diploma application is not complicated, yet covers many fundamental concepts for Algorand smart contract programming. Key concepts explored include:
+This DApp exemplifies a simple yet tangible use-case for the Algorand blockchain. This diploma application is not complicated, yet covers many fundamental concepts for Algorand smart contract programming. Key concepts explored include:
 
 - Writing a PyTEAL smart contract adhering to all of the best standard practices
   - Supports the full life cycle of a smart contract, from deployment to deletion
-  - Multiple account types with differing privilege levels
+  - Multiple account types with different privilege levels
   - Permission checking to ensure application security and integrity
-  - Supports multiple commands with different behaviours
+  - Supports multiple commands with different behaviors
 - Writing an interface program using an Algorand SDK
   - An easy interface to develop, maintain and use the DApp
 
