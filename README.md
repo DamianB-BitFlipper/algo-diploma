@@ -4,7 +4,7 @@
 
 1. Set up `algod` and `goal` to connect to the testnet or a private network and create a few user accounts. Follow the tutorial for assistance: https://developer.algorand.org/docs/run-a-node/setup/install/
 
-2. Install the required Python packages: `pip install requirements.txt`
+2. Install the required Python packages: `pip3 install requirements.txt`
 
 3. Once you have a few test accounts with a balance,  list them in the `config.yml` file:
 
