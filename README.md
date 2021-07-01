@@ -31,10 +31,10 @@ This example config file lists three users, of which `alice` is the registrar. T
 This command will print an identifying number for `APP_ID`. Be sure to record this in the `config.yml`.
 
 6. Use the DApp:
-   - Issue a diploma to `bob`: `python3 run_diplom.py issue-diploma bob "MIT,2020,BSc,Computer Science and Engineering"`
-   - Transfer registrar duties to `charlie`: `python3 run_diplom.py charlie` 
+  1. Issue a diploma to `bob`: `python3 run_diplom.py issue-diploma bob "MIT,2020,BSc,Computer Science and Engineering"`
+  2. Transfer registrar duties to `charlie`: `python3 run_diplom.py charlie` 
 Be sure to update the registrar in the `config.yml` accordingly.
-   - For more commands run: `python3 run_diplom.py help`
+  3. For more commands run: `python3 run_diplom.py help`
 
 ## Table of Contents
 
@@ -318,3 +318,4 @@ This DApp exemplifies a simple yet tanglible use-case for the Algorand blockchai
   - An easy interface to develop, maintain and use the DApp
 
 **This solution is intended for learning purposes only. It does not cover error checking and other edge cases therefore, should not be used as a production application.**
+This code is free to be used as outlined in the MIT License.
