@@ -4,7 +4,7 @@
 
 1. Set up `algod` and `goal` to connect to the testnet or a private network and create a few user accounts. Follow the tutorial for assistance: https://developer.algorand.org/docs/run-a-node/setup/install/
 
-2. Install the required Python packages: `pip3 install requirements.txt`
+2. Install the required Python packages: `pip3 install -r requirements.txt`
 
 3. Once you have a few test accounts with a balance,  list them in the `config.yml` file:
 
@@ -38,7 +38,24 @@ Be sure to update the registrar in the `config.yml` accordingly.
 
 ## Table of Contents
 
-TODO
+1. [Usage](#usage)
+2. [Table of Contents](#table-of-contents)
+3. [Overview](#overview)
+4. [Explaining the DApp](#explaining-the-dapp)
+   - [Roles](#roles)
+   - [Smart Contract Code](#smart-contract-code)
+     + [Storage](#storage)
+     + [Overall DApp Architecture](#overall-dapp-architecture)
+     + [Contract Logic](#contract-logic)
+     + [Contract Initialization](#contract-initialization)
+     + [Diploma Issuance](#diploma-issuance)
+     + [Revoke Diploma](#revoke-diploma)
+     + [Registrar Reassignment](#registrar-reassignment)
+   - [DApp Interface Program](#dapp-interface-program)
+     + [DApp Maintenance](#dapp-maintenance)
+     + [DApp Common Usage](#dapp-common-usage)
+     + [DApp Inspection](#dapp-inspection)
+5. [Conclusion](#conclusion)
 
 ## Overview
 
