@@ -320,7 +320,7 @@ def main():
             return
 
         # Read the smart contract source files
-        smart_contract_file = open("./assets/diplom_smart_contract.teal", "rb")
+        smart_contract_file = open("./assets/diploma_smart_contract.teal", "rb")
         smart_contract_source = smart_contract_file.read()
         smart_contract_program = common.compile_program(algod_client, smart_contract_source)
 

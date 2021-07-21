@@ -27,14 +27,14 @@ This example config file lists three users, of which `alice` is the registrar. T
 
 4. Make the PyTEAL contract code: `make`
 
-5. Deploy the smart contract: `python3 run_diplom.py deploy`
+5. Deploy the smart contract: `python3 run_diploma.py deploy`
 This command will print an identifying number for `APP_ID`. Be sure to record this in the `config.yml`.
 
 6. Use the DApp:
-  1. Issue a diploma to `bob`: `python3 run_diplom.py issue-diploma bob "MIT,2020,BSc,Computer Science and Engineering"`
-  2. Transfer registrar duties to `charlie`: `python3 run_diplom.py charlie` 
+  1. Issue a diploma to `bob`: `python3 run_diploma.py issue-diploma bob "MIT,2020,BSc,Computer Science and Engineering"`
+  2. Transfer registrar duties to `charlie`: `python3 run_diploma.py charlie` 
 Be sure to update the registrar in the `config.yml` accordingly.
-  3. For more commands run: `python3 run_diplom.py help`
+  3. For more commands run: `python3 run_diploma.py help`
 
 ## Table of Contents
 
@@ -60,14 +60,14 @@ Be sure to update the registrar in the `config.yml` accordingly.
 ## Overview
 
 <p align="center">
-  <img src="images/algo-diplom-overview.png" />
+  <img src="images/algo-diploma-overview.png" />
 </p>
 
 This DApp demonstrates how the Algorand blockchain can facilitate diploma issuance for graduating university students. Graduating students can opt-in to this DApp. And then a privileged registrar account can issue specific diplomas to specific students. Students get their diploma recorded under their account which any 3rd party can audit and verify its integrity. 
 
 Additionally, the registrar can perform other operations for posterity. One such operation is transferring registrar duties to another account. After such transfer, the designated account will become the new registrar and the old registrar will lose all privileges. The registrar may also revoke diplomas if needed and also delete the entire DApp.
 
-A detailed overview of all possible operations for both students and registrar can be found by running: `python3 run_diplom.py help`
+A detailed overview of all possible operations for both students and registrar can be found by running: `python3 run_diploma.py help`
 
 ## Explaining the DApp
 
@@ -78,7 +78,7 @@ A detailed overview of all possible operations for both students and registrar c
 
 ### Smart Contract Code
 
-This DApp is expressed as a stateful Algorand smart contract. It is written in [PyTEAL](https://pyteal.readthedocs.io/en/stable/overview.html "PyTEAL") following the suggested development [guidelines](https://developer.algorand.org/docs/reference/teal/guidelines/ "guidelines"). The smart contract source code is accessible [here](https://github.com/JSmith-BitFlipper/algo-diplom/blob/master/assets/diplom_smart_contract.py "here").
+This DApp is expressed as a stateful Algorand smart contract. It is written in [PyTEAL](https://pyteal.readthedocs.io/en/stable/overview.html "PyTEAL") following the suggested development [guidelines](https://developer.algorand.org/docs/reference/teal/guidelines/ "guidelines"). The smart contract source code is accessible [here](https://github.com/JSmith-BitFlipper/algo-diploma/blob/master/assets/diploma_smart_contract.py "here").
 
 #### Storage
 There is one global bytes field and one local bytes field (per opted-in account). The global field holds the address of the current registrar. The account with this address has all of the registrar privileges of this DApp. The local field per account is where an issued diploma is recorded. A diploma is represented as a bytes array of common metadata such as issuing institution, year, degree title and type, etc.
@@ -173,7 +173,7 @@ This block reassigns the registrar of this DApp. This code is invoked by the `"r
 
 This DApp is interfaced with a Python program using the Algorand SDK. This program is used to deploy the DApp as well as invoke the various DApp commands. Much of the SDK code and helper functions are borrowed from an example Algorand SDK app [here](https://github.com/algorand/docs/blob/master/examples/smart_contracts/v2/python/stateful_smart_contracts.py "here"). 
 
-This SDK program has a host of functions. The help message from `python3 run_diplom.py help` lists the available functions:
+This SDK program has a host of functions. The help message from `python3 run_diploma.py help` lists the available functions:
 ```
 Available commands:
         deploy: Deploy this smart contract for the first time
@@ -202,7 +202,7 @@ Deployment of a smart contract begins with compiling the TEAL programs to a base
 
 ```python
 # Read the smart contract source files
-smart_contract_file = open("./assets/diplom_smart_contract.teal", "rb")
+smart_contract_file = open("./assets/diploma_smart_contract.teal", "rb")
 smart_contract_source = smart_contract_file.read()
 smart_contract_program = common.compile_program(algod_client, smart_contract_source)
 
@@ -317,5 +317,4 @@ This DApp exemplifies a simple yet tangible use-case for the Algorand blockchain
 - Writing an interface program using an Algorand SDK
   - An easy interface to develop, maintain and use the DApp
 
-**This solution is intended for learning purposes only. It does not cover error checking and other edge cases therefore, should not be used as a production application.**
-This code is free to be used as outlined in the MIT License.
+**This solution is intended for learning purposes only. It does not cover error checking and other edge cases therefore, should not be used as a production application.** This code is free to be used as outlined by the MIT License.
