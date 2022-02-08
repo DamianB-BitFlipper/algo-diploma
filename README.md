@@ -52,6 +52,7 @@ All of the unit tests are located in the `tests` directory. The code in the `tes
 
 1. [Usage](#usage)
 2. [Tests](#tests)
+   - [Running the Tests](#running-the-tests)
 3. [Table of Contents](#table-of-contents)
 4. [Overview](#overview)
 5. [Explaining the DApp](#explaining-the-dapp)
