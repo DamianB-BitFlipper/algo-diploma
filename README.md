@@ -51,7 +51,7 @@ All of the unit tests are located in the `tests` directory. The code in the `tes
 ## Table of Contents
 
 1. [Usage](#usage)
-2. [Tests](#tests)
+2. [Testing](#testing)
    - [Running the Tests](#running-the-tests)
 3. [Table of Contents](#table-of-contents)
 4. [Overview](#overview)
