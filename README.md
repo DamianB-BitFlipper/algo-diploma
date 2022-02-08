@@ -36,12 +36,25 @@ This command will print an identifying number for `APP_ID`. Be sure to record th
 Be sure to update the registrar in the `config.yml` accordingly.
   3. For more commands run: `python3 run_diploma.py help`
 
+## Testing
+
+All of the unit tests are located in the `tests` directory. The code in the `tests` directory is a prepared example for how to use the *AlgoPytest* testing framework. The code in `conftest.py` demonstrates how to initialize *AlgoPytest* and then the test files with names beginning with `test_` demonstrate how to properly test all parts of the Algorand Diploma Smart Contract.
+
+### Running the Tests
+
+1. Testing this DApp requires the [*AlgoPytest*](https://github.com/DamianB-BitFlipper/algopytest) plugin. Follow the installation instructions as well as the usage regarding starting the sandbox and setting up the relevant environment variables.
+   - In most cases, the relevant *AlgoPytest* environemnt variables to set are `SANDBOX_DIR` and `INITIAL_FUNDS_ACCOUNT`.
+   - Since this DApp is not an installable Python package, you will need to add the `assets` directory to your `PYTHONPATH` environment variable. That may be done with `export PYTHONPATH=$PYTHONPATH:/path/to/algo-diploma/assets/` for example.
+
+2. Simply run the tests by executing `pytest`in the base directory of `algo-diploma`.
+
 ## Table of Contents
 
 1. [Usage](#usage)
-2. [Table of Contents](#table-of-contents)
-3. [Overview](#overview)
-4. [Explaining the DApp](#explaining-the-dapp)
+2. [Tests](#tests)
+3. [Table of Contents](#table-of-contents)
+4. [Overview](#overview)
+5. [Explaining the DApp](#explaining-the-dapp)
    - [Roles](#roles)
    - [Smart Contract Code](#smart-contract-code)
      + [Storage](#storage)
@@ -55,7 +68,7 @@ Be sure to update the registrar in the `config.yml` accordingly.
      + [DApp Maintenance](#dapp-maintenance)
      + [DApp Common Usage](#dapp-common-usage)
      + [DApp Inspection](#dapp-inspection)
-5. [Conclusion](#conclusion)
+6. [Conclusion](#conclusion)
 
 ## Overview
 
