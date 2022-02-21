@@ -15,7 +15,7 @@ def test_initialization(owner, smart_contract_id):
     # Read the registrar's address from the application's global state
     ret = application_global_state(
         smart_contract_id,
-        addresses=['registrar'],
+        address_fields=['registrar'],
     )
     
     # Assert that the registrar was set properly
