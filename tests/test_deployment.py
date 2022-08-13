@@ -18,11 +18,11 @@ def test_initialization(owner, smart_contract_id):
         address_fields=['registrar'],
     )
     
-    # Assert that the registrar was set properly
+    # Assert that the `registrar` was set properly
     assert ret['registrar'] == owner.address
 
 def test_delete_application_from_owner(owner):
-    app_id = create_app(owner)
+    app_id = create_app("diploma_contract", owner)
     delete_app(owner, app_id)
 
 def test_delete_application_from_nonowner(user1, smart_contract_id):
