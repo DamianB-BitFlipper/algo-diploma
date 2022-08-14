@@ -30,14 +30,14 @@ def test_delete_application_from_nonowner(user1, smart_contract_id):
     with pytest.raises(algosdk.error.AlgodHTTPError):
         delete_app(user1, smart_contract_id)
 
-def test_update_from_owner(owner, smart_contract_id):
+def test_update_from_owner(owner, smart_contract_id, diploma_program_compiled, clear_program_compiled):
     # Should not raise an exception
-    update_app(owner, smart_contract_id)
+    update_app(owner, smart_contract_id, diploma_program_compiled, clear_program_compiled)
 
-def test_update_from_nonowner(user1, smart_contract_id):
+def test_update_from_nonowner(user1, smart_contract_id, diploma_program_compiled, clear_program_compiled):
     # Expect an exception
     with pytest.raises(algosdk.error.AlgodHTTPError):
-        update_app(user1, smart_contract_id)
+        update_app(user1, smart_contract_id, diploma_program_compiled, clear_program_compiled)
 
 @pytest.mark.parametrize(
     "users", 
