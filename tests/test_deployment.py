@@ -21,8 +21,11 @@ def test_initialization(owner, smart_contract_id):
     # Assert that the `registrar` was set properly
     assert ret['registrar'] == owner.address
 
-def test_delete_application_from_owner(owner):
-    app_id = create_app("diploma_contract", owner)
+def test_delete_application_from_owner(owner, smart_contract_components):
+    # Unpack the `smart_contract_components`
+    approval_program, clear_program, global_schema, local_schema = smart_contract_components
+    
+    app_id = create_app(owner, approval_program, clear_program, global_schema, local_schema)
     delete_app(owner, app_id)
 
 def test_delete_application_from_nonowner(user1, smart_contract_id):
@@ -30,14 +33,20 @@ def test_delete_application_from_nonowner(user1, smart_contract_id):
     with pytest.raises(algosdk.error.AlgodHTTPError):
         delete_app(user1, smart_contract_id)
 
-def test_update_from_owner(owner, smart_contract_id, diploma_program_compiled, clear_program_compiled):
+def test_update_from_owner(owner, smart_contract_id, smart_contract_components):
+    # Unpack the `smart_contract_components`
+    approval_program, clear_program, _, _ = smart_contract_components
+    
     # Should not raise an exception
-    update_app(owner, smart_contract_id, diploma_program_compiled, clear_program_compiled)
+    update_app(owner, smart_contract_id, approval_program, clear_program)
 
-def test_update_from_nonowner(user1, smart_contract_id, diploma_program_compiled, clear_program_compiled):
+def test_update_from_nonowner(user1, smart_contract_id, smart_contract_components):
+    # Unpack the `smart_contract_components`
+    approval_program, clear_program, _, _ = smart_contract_components
+    
     # Expect an exception
     with pytest.raises(algosdk.error.AlgodHTTPError):
-        update_app(user1, smart_contract_id, diploma_program_compiled, clear_program_compiled)
+        update_app(user1, smart_contract_id, approval_program, clear_program)
 
 @pytest.mark.parametrize(
     "users", 
