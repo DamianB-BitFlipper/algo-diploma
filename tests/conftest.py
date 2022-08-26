@@ -29,6 +29,7 @@ def smart_contract_id(owner):
             approval_program=diploma_program, 
             clear_program=clear_program,
             local_bytes=1,
+            local_ints=1,
             global_bytes=1,        
     ) as app_id:
         yield app_id

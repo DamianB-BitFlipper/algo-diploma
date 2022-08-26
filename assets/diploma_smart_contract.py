@@ -1,6 +1,8 @@
 from pyteal import *
 
 var_registrar = Bytes("registrar")
+var_diploma = Bytes("diploma")
+var_degree_duration = Bytes("degree_duration")
 
 def diploma_program():
     """
@@ -23,10 +25,12 @@ def diploma_program():
     # below. The second argument is the diploma metadata which is
     # set to the local storage of the supplied account (Int(1))
     diploma_metadata = Txn.application_args[1]
+    degree_duration = Txn.application_args[2]
     issue_diploma = Seq([
         Assert(is_registrar),
-        Assert(Txn.application_args.length() == Int(2)),
-        App.localPut(Int(1), Bytes("diploma"), diploma_metadata),
+        Assert(Txn.application_args.length() == Int(3)),
+        App.localPut(Int(1), var_diploma, diploma_metadata),
+        App.localPut(Int(1), var_degree_duration, Btoi(degree_duration)),
         Return(Int(1))
     ])
 
@@ -38,7 +42,7 @@ def diploma_program():
     revoke_diploma = Seq([
         Assert(is_registrar),
         Assert(Txn.application_args.length() == Int(1)),
-        App.localDel(Int(1), Bytes("diploma")),
+        App.localDel(Int(1), var_diploma),
         Return(Int(1))
     ])
 

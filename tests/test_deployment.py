@@ -3,6 +3,7 @@ import algosdk
 
 from algopytest import (
     application_global_state,
+    account_balance,
     create_app,
     update_app,
     delete_app,
@@ -11,15 +12,19 @@ from algopytest import (
     clear_app,
 )
 
+def test_owner_funded(owner):
+    balance = account_balance(owner)
+    assert balance == 1_000_000_000
+
 def test_initialization(owner, smart_contract_id):
     # Read the registrar's address from the application's global state
-    ret = application_global_state(
+    state = application_global_state(
         smart_contract_id,
         address_fields=['registrar'],
     )
     
     # Assert that the `registrar` was set properly
-    assert ret['registrar'] == owner.address
+    assert state['registrar'] == owner.address
 
 def test_delete_application_from_owner(owner, smart_contract_components):
     # Unpack the `smart_contract_components`
