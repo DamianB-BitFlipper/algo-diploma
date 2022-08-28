@@ -10,8 +10,8 @@ from clear_program import clear_program
 
 @fixture
 def smart_contract_components():
-    diploma_program_compiled = compile_program(diploma_program, mode=Mode.Application, version=5)
-    clear_program_compiled = compile_program(clear_program, mode=Mode.Application, version=5)
+    diploma_program_compiled = compile_program(diploma_program(), mode=Mode.Application, version=5)
+    clear_program_compiled = compile_program(clear_program(), mode=Mode.Application, version=5)
     global_schema = transaction.StateSchema(num_uints=0, num_byte_slices=1)
     local_schema = transaction.StateSchema(num_uints=0, num_byte_slices=1)    
     
@@ -26,8 +26,8 @@ def smart_contract_components():
 def smart_contract_id(owner):
     with deploy_smart_contract(
             owner,
-            approval_program=diploma_program, 
-            clear_program=clear_program,
+            approval_program=diploma_program(), 
+            clear_program=clear_program(),
             local_bytes=1,
             local_ints=1,
             global_bytes=1,        
