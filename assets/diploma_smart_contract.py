@@ -1,3 +1,4 @@
+# This example is provided for informational purposes only and has not been audited for security.
 from pyteal import *
 
 var_registrar = Bytes("registrar")
@@ -6,7 +7,7 @@ var_degree_duration = Bytes("degree_duration")
 
 def diploma_program():
     """
-    This stateful smart contract issues students' diplomas
+    This stateful smart contract issues students' diplomas.
     """
     # Code block invoked during contract initialization. Sets the
     # registrar to be the sender (creator) of this smart contract
@@ -20,10 +21,11 @@ def diploma_program():
     is_registrar = Txn.sender() == App.globalGet(var_registrar)
 
     # Code block invoked during diploma issuance. Only the registrar
-    # may invoke this block with two arguments and one account supplied.
+    # may invoke this block with three arguments and one account supplied.
     # The first argument was "issue_diploma" used by the control flow 
     # below. The second argument is the diploma metadata which is
-    # set to the local storage of the supplied account (Int(1))
+    # set to the local storage of the supplied account (Int(1)). The
+    # third argument is the duration in years that the degree took.
     diploma_metadata = Txn.application_args[1]
     degree_duration = Txn.application_args[2]
     issue_diploma = Seq([
