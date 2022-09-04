@@ -29,8 +29,11 @@ def diploma_program():
     diploma_metadata = Txn.application_args[1]
     degree_duration = Txn.application_args[2]
     issue_diploma = Seq([
+        # Sanity checks
         Assert(is_registrar),
         Assert(Txn.application_args.length() == Int(3)),
+        Assert(Txn.accounts.length() == Int(1)),
+        
         App.localPut(Int(1), var_diploma, diploma_metadata),
         App.localPut(Int(1), var_degree_duration, Btoi(degree_duration)),
         Return(Int(1))
@@ -42,8 +45,11 @@ def diploma_program():
     # below. The local storage containing the diploma metadata of the 
     # supplied account (Int(1)) is deleted.
     revoke_diploma = Seq([
+        # Sanity checks
         Assert(is_registrar),
         Assert(Txn.application_args.length() == Int(1)),
+        Assert(Txn.accounts.length() == Int(1)),
+        
         App.localDel(Int(1), var_diploma),
         Return(Int(1))
     ])
@@ -55,7 +61,10 @@ def diploma_program():
     # is set to the supplied account (Txn.accounts[1])
     new_registrar = Txn.accounts[1]
     reassign_registrar = Seq([
+        # Sanity checks
         Assert(is_registrar),
+        Assert(Txn.accounts.length() == Int(1)),
+        
         Assert(Txn.application_args.length() == Int(1)),
         App.globalPut(var_registrar, new_registrar),
         Return(Int(1))
