@@ -59,10 +59,9 @@ def test_issue_diplomas(request, owner_in, users, smart_contract_id):
         # The application arguments and account to be passed in to 
         # the smart contract as it expects
         app_args = ['issue_diploma', diploma_metadata, 4]
-        accounts = [user_in.address]
 
         # Issue the `diploma_metadata` to the recipient `user`
-        call_app(owner_in, smart_contract_id, app_args=app_args, accounts=accounts)
+        call_app(owner_in, smart_contract_id, app_args=app_args, accounts=[user_in])
 
         # Check that the diploma was issued
         state = application_local_state(smart_contract_id, user_in)
@@ -92,10 +91,9 @@ def test_issue_many_diplomas(request, owner_in, create_user, smart_contract_id):
         # The application arguments and account to be passed in to 
         # the smart contract as it expects
         app_args = ['issue_diploma', diploma_metadata, 4]
-        accounts = [user.address]
 
         # Issue the `diploma_metadata` to the recipient `user`
-        call_app(owner_in, smart_contract_id, app_args=app_args, accounts=accounts)
+        call_app(owner_in, smart_contract_id, app_args=app_args, accounts=[user])
 
     for user in users:
         # Check that the diploma was issued to `user`
