@@ -7,41 +7,6 @@ from algopytest import (
     close_out_app,
 )
 
-def opt_in_user(user, smart_contract_id):
-    """Opt-in the ``user`` to the ``smart_contract_id`` application."""
-    opt_in_app(user, smart_contract_id)
-
-    # The test runs here    
-    yield user
-    
-    # Clean up by closing out of the application    
-    close_out_app(user, smart_contract_id)
-
-@pytest.fixture()
-def owner_in(owner, smart_contract_id):
-    """Create an ``owner`` fixture that has already opted in to ``smart_contract_id``."""
-    yield from opt_in_user(owner, smart_contract_id)
-
-@pytest.fixture()
-def user1_in(user1, smart_contract_id):
-    """Create an ``user1`` fixture that has already opted in to ``smart_contract_id``."""
-    yield from opt_in_user(user1, smart_contract_id)
-
-@pytest.fixture()
-def user2_in(user2, smart_contract_id):
-    """Create an ``user2`` fixture that has already opted in to ``smart_contract_id``."""
-    yield from opt_in_user(user2, smart_contract_id)
-
-@pytest.fixture()
-def user3_in(user3, smart_contract_id):
-    """Create an ``user3`` fixture that has already opted in to ``smart_contract_id``."""
-    yield from opt_in_user(user3, smart_contract_id)
-
-@pytest.fixture()
-def user4_in(user4, smart_contract_id):
-    """Create an ``user4`` fixture that has already opted in to ``smart_contract_id``."""
-    yield from opt_in_user(user4, smart_contract_id)    
-    
 @pytest.mark.parametrize(
     "users",
     [

@@ -10,7 +10,7 @@ def diploma_program():
     This stateful smart contract issues students' diplomas.
     """
     # Code block invoked during contract initialization. Sets the
-    # registrar to be the sender (creator) of this smart contract
+    # `registrar` to be the sender (creator) of this smart contract
     init_contract = Seq([
         App.globalPut(var_registrar, Txn.sender()),
         Return(Int(1))
@@ -85,4 +85,4 @@ def diploma_program():
     return program
 
 if __name__ == "__main__":
-    print(compileTeal(diploma_program(), Mode.Application, version=3))
+    print(compileTeal(diploma_program(), Mode.Application, version=5))
