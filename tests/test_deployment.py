@@ -35,7 +35,7 @@ def test_delete_application_from_owner(owner, smart_contract_components):
 
 def test_delete_application_from_nonowner(user1, smart_contract_id):
     # Expect an exception
-    with pytest.raises(algosdk.error.AlgodHTTPError):
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: transaction rejected by ApprovalProgram'):
         delete_app(user1, smart_contract_id)
 
 def test_update_from_owner(owner, smart_contract_id, smart_contract_components):
@@ -50,7 +50,7 @@ def test_update_from_nonowner(user1, smart_contract_id, smart_contract_component
     approval_program, clear_program, _, _ = smart_contract_components
     
     # Expect an exception
-    with pytest.raises(algosdk.error.AlgodHTTPError):
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: transaction rejected by ApprovalProgram'):
         update_app(user1, smart_contract_id, approval_program, clear_program)
 
 @pytest.mark.parametrize(
@@ -93,7 +93,7 @@ def test_opt_in_twice_out(owner, opt_out_fn, smart_contract_id):
     opt_in_app(owner, smart_contract_id)
 
     # Expect an exception on the second opt in
-    with pytest.raises(algosdk.error.AlgodHTTPError):
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: account .* has already opted in to app \d+'):
         opt_in_app(owner, smart_contract_id)
 
     opt_out_fn(owner, smart_contract_id)
@@ -110,6 +110,6 @@ def test_opt_in_out_twice(owner, opt_out_fn, smart_contract_id):
     opt_out_fn(owner, smart_contract_id)
 
     # Expect an exception on the second close out
-    with pytest.raises(algosdk.error.AlgodHTTPError):
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: .*is not.*opted in.*app.*\d+'):
         opt_out_fn(owner, smart_contract_id)
     
