@@ -51,6 +51,7 @@ def diploma_program():
         Assert(Txn.accounts.length() == Int(1)),
         
         App.localDel(Int(1), var_diploma),
+        App.localDel(Int(1), var_degree_duration),
         Return(Int(1))
     ])
 
