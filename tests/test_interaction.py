@@ -2,6 +2,7 @@ import pytest
 import algosdk
 
 from algopytest import (
+    application_global_state,
     application_local_state,
     call_app, 
     opt_in_app,
@@ -98,3 +99,25 @@ def test_revoke_diploma_raises(owner_in, user1_in, user2_in, smart_contract_id):
     # The `user2` attempts to revoke the `DIPLOMA_METADATA` of `user1`
     with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: logic eval error: assert failed'):    
         call_app(user2_in, smart_contract_id, app_args=['revoke_diploma'], accounts=[user1_in])
+
+def test_reassign_registrar(owner_in, user1_in, smart_contract_id):
+    # Make the `user1` the registrar
+    call_app(owner_in, smart_contract_id, app_args=['reassign_registrar'], accounts=[user1_in])
+
+    # Read the registrar's address from the application's global state
+    state = application_global_state(
+        smart_contract_id,
+        address_fields=['registrar'],
+    )
+    
+    # Assert that the `registrar` was reassigned properly
+    assert state['registrar'] == user1_in.address
+
+    # In order for the `smart_contract_id` to be cleaned up correctly by AlgoPytest,
+    # creator of the smart contract must be reverted as the registrar
+    call_app(user1_in, smart_contract_id, app_args=['reassign_registrar'], accounts=[owner_in])
+
+def test_reassign_registrar_raises(user1_in, smart_contract_id):
+    # Make the `user1` attempt to take over as the registrar
+    with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: logic eval error: assert failed'):    
+        call_app(user1_in, smart_contract_id, app_args=['reassign_registrar'], accounts=[user1_in])
