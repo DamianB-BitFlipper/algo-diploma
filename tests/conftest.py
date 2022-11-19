@@ -1,7 +1,7 @@
 from pytest import fixture
 from algopytest import (
+    create_app,
     compile_program,
-    deploy_smart_contract,
     opt_in_app,
     close_out_app,
 )
@@ -29,7 +29,7 @@ def smart_contract_components():
 
 @fixture
 def smart_contract_id(owner):
-    with deploy_smart_contract(
+    with create_app(
             owner,
             approval_program=diploma_program(), 
             clear_program=clear_program(),

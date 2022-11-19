@@ -4,7 +4,7 @@ import algosdk
 from algopytest import (
     application_global_state,
     account_balance,
-    create_app,
+    create_compiled_app,
     update_app,
     delete_app,
     opt_in_app,
@@ -30,7 +30,7 @@ def test_delete_application_from_owner(owner, smart_contract_components):
     # Unpack the `smart_contract_components`
     approval_program, clear_program, global_schema, local_schema = smart_contract_components
     
-    app_id = create_app(owner, approval_program, clear_program, global_schema, local_schema)
+    app_id = create_compiled_app(owner, approval_program, clear_program, global_schema, local_schema)
     delete_app(owner, app_id)
 
 def test_delete_application_from_nonowner(user1, smart_contract_id):
