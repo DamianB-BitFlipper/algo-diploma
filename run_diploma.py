@@ -1,7 +1,7 @@
 import sys
 import yaml
 
-from algosdk.future import transaction
+import algosdk.transaction
 from algosdk import account
 from algosdk.v2client import algod
 
@@ -17,8 +17,8 @@ local_ints = 0
 local_bytes = 1
 global_ints = 0
 global_bytes = 1
-global_schema = transaction.StateSchema(global_ints, global_bytes)
-local_schema = transaction.StateSchema(local_ints, local_bytes)
+global_schema = algosdk.transaction.StateSchema(global_ints, global_bytes)
+local_schema = algosdk.transaction.StateSchema(local_ints, local_bytes)
 
 # Create new application
 def create_app(client, private_key, 
@@ -30,7 +30,7 @@ def create_app(client, private_key,
     sender = account.address_from_private_key(private_key)
 
     # Declare on_complete as NoOp
-    on_complete = transaction.OnComplete.NoOpOC.real
+    on_complete = algosdk.transaction.OnComplete.NoOpOC.real
 
     # Get node suggested parameters
     params = client.suggested_params()
@@ -38,7 +38,7 @@ def create_app(client, private_key,
     params.fee = 1000
 
     # Create unsigned transaction
-    txn = transaction.ApplicationCreateTxn(
+    txn = algosdk.transaction.ApplicationCreateTxn(
         sender, params, on_complete, \
         approval_program, clear_program, \
         global_schema, local_schema)
@@ -72,7 +72,7 @@ def opt_in_app(client, private_key, index):
     params.fee = 1000
 
     # Create unsigned transaction
-    txn = transaction.ApplicationOptInTxn(sender, params, index)
+    txn = algosdk.transaction.ApplicationOptInTxn(sender, params, index)
 
     # Sign transaction
     signed_txn = txn.sign(private_key)
@@ -100,7 +100,7 @@ def call_app(client, private_key, index, app_args, accounts):
     params.fee = 1000
 
     # Create unsigned transaction
-    txn = transaction.ApplicationNoOpTxn(sender, params, index, app_args, accounts)
+    txn = algosdk.transaction.ApplicationNoOpTxn(sender, params, index, app_args, accounts)
 
     # Sign transaction
     signed_txn = txn.sign(private_key)
@@ -134,7 +134,7 @@ def update_app(client, private_key, app_id, approval_program, clear_program):
     params.fee = 1000
 
     # Create unsigned transaction
-    txn = transaction.ApplicationUpdateTxn(sender, params, app_id, \
+    txn = algosdk.transaction.ApplicationUpdateTxn(sender, params, app_id, \
                                             approval_program, clear_program) #, app_args)
 
     # Sign transaction
@@ -165,7 +165,7 @@ def delete_app(client, private_key, index):
     params.fee = 1000
 
     # Create unsigned transaction
-    txn = transaction.ApplicationDeleteTxn(sender, params, index)
+    txn = algosdk.transaction.ApplicationDeleteTxn(sender, params, index)
 
     # Sign transaction
     signed_txn = txn.sign(private_key)
@@ -193,7 +193,7 @@ def close_out_app(client, private_key, index):
     params.fee = 1000
 
     # Create unsigned transaction
-    txn = transaction.ApplicationCloseOutTxn(sender, params, index)
+    txn = algosdk.transaction.ApplicationCloseOutTxn(sender, params, index)
 
     # Sign transaction
     signed_txn = txn.sign(private_key)
@@ -221,7 +221,7 @@ def clear_app(client, private_key, index):
     params.fee = 1000
 
     # Create unsigned transaction
-    txn = transaction.ApplicationClearStateTxn(sender, params, index)
+    txn = algosdk.transaction.ApplicationClearStateTxn(sender, params, index)
 
     # Sign transaction
     signed_txn = txn.sign(private_key)

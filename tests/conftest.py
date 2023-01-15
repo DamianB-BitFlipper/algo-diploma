@@ -5,7 +5,7 @@ from algopytest import (
     opt_in_app,
     close_out_app,
 )
-from algosdk.future import transaction
+import algosdk.transaction
 from pyteal import Mode
 
 # Load the smart contracts from this project. The path to find these
@@ -17,8 +17,8 @@ from clear_program import clear_program
 def smart_contract_components():
     diploma_program_compiled = compile_program(diploma_program(), mode=Mode.Application, version=5)
     clear_program_compiled = compile_program(clear_program(), mode=Mode.Application, version=5)
-    global_schema = transaction.StateSchema(num_uints=0, num_byte_slices=1)
-    local_schema = transaction.StateSchema(num_uints=0, num_byte_slices=1)    
+    global_schema = algosdk.transaction.StateSchema(num_uints=0, num_byte_slices=1)
+    local_schema = algosdk.transaction.StateSchema(num_uints=0, num_byte_slices=1)    
     
     return (
         diploma_program_compiled,
