@@ -18,7 +18,7 @@ def test_owner_funded(owner):
     assert balance == 1_000_000_000
 
 def test_initialization(owner, smart_contract_id):
-    """Test that the init logic of the smart contract passes."""
+    """Test that the initialization logic of the smart contract passes."""
     # Read the registrar's address from the application's global state
     state = application_global_state(
         smart_contract_id,
