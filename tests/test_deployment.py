@@ -13,10 +13,12 @@ from algopytest import (
 )
 
 def test_owner_funded(owner):
+    """Test whether the ``owner`` fixture was funded correctly."""
     balance = account_balance(owner)
     assert balance == 1_000_000_000
 
 def test_initialization(owner, smart_contract_id):
+    """Test that the init logic of the smart contract passes."""
     # Read the registrar's address from the application's global state
     state = application_global_state(
         smart_contract_id,
@@ -27,6 +29,7 @@ def test_initialization(owner, smart_contract_id):
     assert state['registrar'] == owner.address
 
 def test_delete_application_from_owner(owner, smart_contract_components):
+    """Test that the application is deleteable by its ``owner``."""
     # Unpack the `smart_contract_components`
     approval_program, clear_program, global_schema, local_schema = smart_contract_components
     
@@ -34,11 +37,13 @@ def test_delete_application_from_owner(owner, smart_contract_components):
     delete_app(owner, app_id)
 
 def test_delete_application_from_nonowner(user1, smart_contract_id):
+    """Test that no non-owner may delete the application."""
     # Expect an exception
     with pytest.raises(algosdk.error.AlgodHTTPError, match=r'transaction .*: transaction rejected by ApprovalProgram'):
         delete_app(user1, smart_contract_id)
 
 def test_update_from_owner(owner, smart_contract_id, smart_contract_components):
+    """Test that the owner may update the application."""
     # Unpack the `smart_contract_components`
     approval_program, clear_program, _, _ = smart_contract_components
     
@@ -46,6 +51,7 @@ def test_update_from_owner(owner, smart_contract_id, smart_contract_components):
     update_app(owner, smart_contract_id, approval_program, clear_program)
 
 def test_update_from_nonowner(user1, smart_contract_id, smart_contract_components):
+    """Test that no non-owner may update the application."""
     # Unpack the `smart_contract_components`
     approval_program, clear_program, _, _ = smart_contract_components
     
@@ -71,6 +77,7 @@ def test_update_from_nonowner(user1, smart_contract_id, smart_contract_component
     ]
 )
 def test_opt_in_out(request, users, opt_out_fn, smart_contract_id):
+    """Test various combinations of users opting in and out of the application."""
     # Convert the string fixture names to the actual fixtures
     users = list(map(lambda user: request.getfixturevalue(user), users))
 
@@ -90,6 +97,7 @@ def test_opt_in_out(request, users, opt_out_fn, smart_contract_id):
     ]
 )
 def test_opt_in_twice_out(owner, opt_out_fn, smart_contract_id):
+    """Test that opting in twice consecutively fails."""
     opt_in_app(owner, smart_contract_id)
 
     # Expect an exception on the second opt in
@@ -106,6 +114,7 @@ def test_opt_in_twice_out(owner, opt_out_fn, smart_contract_id):
     ]
 )
 def test_opt_in_out_twice(owner, opt_out_fn, smart_contract_id):
+    """Test that opting out twice consecutively fails."""
     opt_in_app(owner, smart_contract_id)
     opt_out_fn(owner, smart_contract_id)
 

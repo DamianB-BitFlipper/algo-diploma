@@ -38,7 +38,7 @@ Be sure to update the registrar in the `config.yml` accordingly.
 
 ## Testing
 
-All of the unit tests are located in the `tests` directory. The code in the `tests` directory is a prepared example for how to use the *AlgoPytest* testing framework. The code in `conftest.py` demonstrates how to initialize *AlgoPytest* and then the test files with names beginning with `test_` demonstrate how to properly test all parts of the Algorand Diploma Smart Contract.
+All of the unit tests are located in the `tests` directory. The code in the `tests` directory is a prepared example for how to use the *AlgoPytest* testing framework to test a single smart contract Algorand application. The code in `conftest.py` demonstrates how to initialize *AlgoPytest* and then the test files with names beginning with `test_` demonstrate how to properly test all parts of the Algorand Diploma Smart Contract.
 
 ### Running the Tests
 

@@ -15,6 +15,7 @@ from clear_program import clear_program
 
 @fixture
 def smart_contract_components():
+    """Return the components of a smart contract required to deploy without deploying yet."""
     diploma_program_compiled = compile_program(diploma_program(), mode=Mode.Application, version=5)
     clear_program_compiled = compile_program(clear_program(), mode=Mode.Application, version=5)
     global_schema = algosdk.transaction.StateSchema(num_uints=0, num_byte_slices=1)
@@ -29,6 +30,7 @@ def smart_contract_components():
 
 @fixture
 def smart_contract_id(owner):
+    """Deploy the ``diploma_program`` to the Algorand network."""
     with create_app(
             owner,
             approval_program=diploma_program(), 
